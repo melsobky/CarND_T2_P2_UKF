@@ -31,6 +31,21 @@ public:
   ///* predicted sigma points matrix
   MatrixXd Xsig_pred_;
 
+  ///* augmented sigma points matrix
+  MatrixXd Xsig_aug;
+
+  //mean predicted measurement
+  VectorXd z_pred;
+
+  //innovation covariance matrix S
+  MatrixXd S;
+
+  //create matrix for sigma points in measurement space;
+  MatrixXd Zsig;
+
+  ///* Weights of sigma points
+  VectorXd weights_;
+
   ///* time when the state is true, in us
   long long time_us_;
 
@@ -55,8 +70,8 @@ public:
   ///* Radar measurement noise standard deviation radius change in m/s
   double std_radrd_ ;
 
-  ///* Weights of sigma points
-  VectorXd weights_;
+  ///* Sigma point spreading parameter
+  double lambda_;
 
   ///* State dimension
   int n_x_;
@@ -64,8 +79,8 @@ public:
   ///* Augmented state dimension
   int n_aug_;
 
-  ///* Sigma point spreading parameter
-  double lambda_;
+  //set measurement dimension, radar can measure r, phi, and r_dot
+  int n_z_;
 
 
   /**
@@ -102,6 +117,36 @@ public:
    * @param meas_package The measurement at k+1
    */
   void UpdateRadar(MeasurementPackage meas_package);
+
+  /**
+   * Generates the sigma points
+   */
+  void GenerateAugmentedSigmaPoints();
+
+  /**
+   * Predict sigma Points
+   */
+  void SigmaPointPrediction(double delta_t);
+
+  /*
+   * Predict Mean And Covariance
+   */
+  void PredictMeanAndCovariance();
+
+  /*
+   * Radar Measurement Prediction
+   */
+  void RadarMeasurementPrediction();
+
+  /*
+     * Lidar Measurement Prediction
+     */
+  void LidarMeasurementPrediction();
+
+  /*
+   * Perform UKF update for the current measurement
+   */
+  void Update(VectorXd z);
 };
 
 #endif /* UKF_H */
